@@ -1,0 +1,11 @@
+{
+  "name": "quack",
+  "version": "1.0.0",
+  "main": "assets/main.css",
+  "author": "Dominik Nakamura <dnaka91@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "tailwindcss": "^3.3.3"
+  }
+}

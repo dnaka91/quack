@@ -1,0 +1,23 @@
+[package]
+name = "quack"
+version = "0.1.0"
+authors = ["Dominik Nakamura <dnaka91@gmail.com>"]
+edition = "2021"
+license = "AGPL-3.0-only"
+
+[dependencies]
+console_error_panic_hook = "0.1.7"
+getrandom = { version = "0.2.10", features = ["js"] }
+gloo-storage = "0.3.0"
+leptos = { version = "0.5.0-beta", features = ["csr"] }
+rand = "0.8.5"
+serde = { version = "=1.0.171", features = ["derive"] }
+tracing = "0.1.37"
+tracing-wasm = "0.2.1"
+wasm-bindgen = "0.2.87"
+wasm-bindgen-futures = "0.4.37"
+web-sys = { version = "0.3.64", features = ["HtmlAudioElement"] }
+
+[profile.release]
+lto = true
+opt-level = "z"
