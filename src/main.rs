@@ -4,14 +4,15 @@ use leptos::{
 };
 use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
-use tracing::info;
+use log::info;
 use wasm_bindgen::{throw_str, UnwrapThrowExt};
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Event, HtmlAudioElement};
 
 fn main() {
     console_error_panic_hook::set_once();
-    tracing_wasm::set_as_global_default();
+    #[cfg(debug_assertions)]
+    console_log::init_with_level(log::Level::Trace).unwrap_throw();
 
     leptos::mount_to_body(|| view! { <App/> });
 }
@@ -114,7 +115,7 @@ fn settings(
         let select = move |_| {
             if selection.get() != duck {
                 selection.set(duck);
-                info!(?duck, "selected duck");
+                info!("selected Duck::{duck:?}");
             }
         };
 
