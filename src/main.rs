@@ -1,10 +1,13 @@
+use std::fmt::Debug;
+
 use gloo_storage::{errors::StorageError, LocalStorage, Storage};
 use leptos::{
-    component, create_effect, event_target_value, prelude::*, spawn_local, view, For, IntoView,
+    component, create_effect, event_target_value, prelude::*, spawn_local, view, Children, For,
+    IntoView,
 };
-use log::info;
+use log::{debug, warn};
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::{throw_str, UnwrapThrowExt};
+use wasm_bindgen::UnwrapThrowExt;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Event, HtmlAudioElement};
 
@@ -23,35 +26,9 @@ const DEFAULT_VOLUME: f64 = 0.1;
 fn app() -> impl IntoView {
     let show_settings = create_rw_signal(false);
 
-    let ducky = create_rw_signal(match LocalStorage::get("ducky") {
-        Ok(value) => value,
-        Err(StorageError::KeyNotFound(_)) => Duck::One,
-        Err(err) => throw_str(&err.to_string()),
-    });
-
-    create_effect(move |_| {
-        LocalStorage::set("ducky", ducky.get()).unwrap_throw();
-    });
-
-    let playback_rate = create_rw_signal(match LocalStorage::get("playback_rate") {
-        Ok(value) => value,
-        Err(StorageError::KeyNotFound(_)) => DEFAULT_PLAYBACK_RATE,
-        Err(err) => throw_str(&err.to_string()),
-    });
-
-    create_effect(move |_| {
-        LocalStorage::set("playback_rate", playback_rate.get()).unwrap_throw();
-    });
-
-    let volume = create_rw_signal(match LocalStorage::get("volume") {
-        Ok(value) => value,
-        Err(StorageError::KeyNotFound(_)) => DEFAULT_VOLUME,
-        Err(err) => throw_str(&err.to_string()),
-    });
-
-    create_effect(move |_| {
-        LocalStorage::set("volume", volume.get()).unwrap_throw();
-    });
+    let ducky = create_stored_signal("ducky", Duck::One);
+    let playback_rate = create_stored_signal("playback_rate", DEFAULT_PLAYBACK_RATE);
+    let volume = create_stored_signal("volume", DEFAULT_VOLUME);
 
     view! {
         <div class="flex flex-col gap-3 items-center place-content-center w-screen h-screen">
@@ -118,7 +95,6 @@ fn settings(
         let select = move |_| {
             if selection.get() != duck {
                 selection.set(duck);
-                info!("selected Duck::{duck:?}");
             }
         };
 
@@ -129,16 +105,16 @@ fn settings(
                     on:click=select
                 />
                 <img
-                    class="w-64 transition-all rounded-lg border-4 border-transparent peer-checked:border-sky-500 hover:border-sky-200"
+                    class="settings-duck-image"
                     srcset=duck.srcset()
                 />
             </label>
         }
     };
 
-    let content = move || {
-        view! {
-            <p class="mb-2 text-lg font-bold">"Pick your duck!"</p>
+    view! {
+        <Dialog show=show>
+            <p class="settings-header">"Pick your duck!"</p>
             <Slider
                 label="Playback rate"
                 value=playback_rate
@@ -153,7 +129,7 @@ fn settings(
                 min=0.01
                 max=1.0
             />
-            <div class="grid grid-cols-2 gap-4 my-2">
+            <div class="settings-ducks">
                 <For
                     each=Duck::iter
                     key=|duck| *duck
@@ -161,15 +137,18 @@ fn settings(
                 />
             </div>
             <button class="btn p-2" on:click=close>"Close"</button>
-        }
-    };
+        </Dialog>
+    }
+}
 
+#[component]
+fn dialog(children: Children, #[prop(into)] show: Signal<bool>) -> impl IntoView {
     view! {
-        <div class="relative z-10" hidden={move || !show.get()}>
-            <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity"/>
-            <div class="flex fixed inset-0 justify-center items-center p-4 min-h-full text-center">
-                <div class="flex flex-col gap-1 p-4 rounded-lg shadow-lg bg-slate-700 text-slate-200">
-                    {content}
+        <div class="dialog" hidden={move || !show.get()}>
+            <div class="dialog-backdrop"/>
+            <div class="dialog-content">
+                <div class="settings-dialog">
+                    {children()}
                 </div>
             </div>
         </div>
@@ -250,7 +229,7 @@ fn slider(
     let reset = move |_| value.set(default);
 
     view! {
-        <div class="flex gap-1 self-stretch place-items-stretch text-left">
+        <div class="slider">
             <span class="w-32">{label}</span>
             <input class="grow" type="range" min=min max=max step="any" value={move || value.get()} prop:value={move || value.get()} on:change=input/>
             <button class="btn py-0.5 px-1" on:click=reset>"Reset"</button>
@@ -264,7 +243,7 @@ fn footer() -> impl IntoView {
     const VIDEVO: &str = "https://www.videvo.net/search/?q=animal+duck+cartoon&mode=sound-effects";
 
     view! {
-        <div class="fixed p-4 bottom-4 bg-slate-700/50 text-slate-400 rounded-lg">
+        <div class="footer fixed bottom-4">
             "Images from "
             <a class="link" href=PEXELS target="_blank">"Pexels"</a>
 
@@ -274,4 +253,27 @@ fn footer() -> impl IntoView {
             <a class="link" href=VIDEVO target="_blank">"Videvo"</a>
         </div>
     }
+}
+
+fn create_stored_signal<T>(key: &'static str, default: T) -> RwSignal<T>
+where
+    T: Clone + Debug + Serialize,
+    for<'de> T: Deserialize<'de>,
+{
+    let signal = create_rw_signal(match LocalStorage::get(key) {
+        Ok(value) => value,
+        Err(StorageError::KeyNotFound(_)) => default,
+        Err(e) => {
+            warn!("failed loading `{key}` from storage:\n{e:?}");
+            default
+        }
+    });
+
+    create_effect(move |_| {
+        let value = signal.get();
+        debug!("changed {key}: {value:.2?}");
+        LocalStorage::set(key, value).unwrap_throw();
+    });
+
+    signal
 }

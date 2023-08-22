@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    body {
+        @apply bg-slate-800 text-slate-200;
+    }
+}
+
 @layer components {
     .btn {
         @apply rounded-md border-2 transition-all bg-slate-600 hover:bg-slate-500 border-slate-500 hover:border-slate-400;
@@ -9,5 +15,41 @@
 
     .link {
         @apply font-bold underline hover:text-blue-400;
+    }
+
+    .slider {
+        @apply flex gap-1 self-stretch place-items-stretch text-left;
+    }
+
+    .footer {
+        @apply p-4 bg-slate-700/50 text-slate-400 rounded-lg;
+    }
+
+    .dialog {
+        @apply relative z-10;
+    }
+
+    .dialog-backdrop {
+        @apply fixed inset-0 bg-gray-500 opacity-75 transition-opacity;
+    }
+
+    .dialog-content {
+        @apply flex fixed inset-0 justify-center items-center p-4 min-h-full text-center;
+    }
+
+    .settings-dialog {
+        @apply flex flex-col gap-1 p-4 rounded-lg shadow-lg bg-slate-700 text-slate-200;
+    }
+
+    .settings-header {
+        @apply mb-2 text-lg font-bold;
+    }
+
+    .settings-ducks {
+        @apply grid grid-cols-2 gap-4 my-2;
+    }
+
+    .settings-duck-image {
+        @apply w-64 transition-all rounded-lg border-4 border-transparent peer-checked:border-sky-500 hover:border-sky-200;
     }
 }
