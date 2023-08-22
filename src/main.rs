@@ -2,7 +2,6 @@ use gloo_storage::{errors::StorageError, LocalStorage, Storage};
 use leptos::{
     component, create_effect, event_target_value, prelude::*, spawn_local, view, For, IntoView,
 };
-use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 use log::info;
 use wasm_bindgen::{throw_str, UnwrapThrowExt};
@@ -194,7 +193,7 @@ fn sounds(playback_rate: Signal<f64>, volume: Signal<f64>) -> impl IntoView {
     let play = move |_| {
         let audio = audio.clone();
         spawn_local(async move {
-            let sound = SOUNDS.choose(&mut rand::thread_rng()).unwrap();
+            let sound = fastrand::choice(SOUNDS).unwrap();
             audio.set_src(sound);
             JsFuture::from(audio.play().unwrap_throw())
                 .await
