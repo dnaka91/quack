@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .btn {
+        @apply rounded-md border-2 transition-all bg-slate-600 hover:bg-slate-500 border-slate-500 hover:border-slate-400;
+    }
+
+    .link {
+        @apply font-bold underline hover:text-blue-400;
+    }
+}

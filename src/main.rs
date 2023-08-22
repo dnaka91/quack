@@ -2,8 +2,8 @@ use gloo_storage::{errors::StorageError, LocalStorage, Storage};
 use leptos::{
     component, create_effect, event_target_value, prelude::*, spawn_local, view, For, IntoView,
 };
-use serde::{Deserialize, Serialize};
 use log::info;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::{throw_str, UnwrapThrowExt};
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Event, HtmlAudioElement};
@@ -69,6 +69,7 @@ fn app() -> impl IntoView {
                 volume=volume
                 selection=ducky
             />
+            <Footer/>
         </div>
     }
 }
@@ -78,9 +79,9 @@ fn navbar(#[prop(into)] settings: SignalSetter<bool>) -> impl IntoView {
     let settings = move |_| settings.set(true);
 
     view! {
-        <div class="flex gap-2 place-items-center m-3">
+        <div class="flex gap-2 place-items-center">
             <div class="text-2xl">"🦆 Quack"</div>
-            <button class="p-2 rounded border-2 transition-all bg-slate-600 border-slate-700 hover:bg-slate-500 hover:border-slate-600" on:click=settings>"Settings"</button>
+            <button class="btn p-2" on:click=settings>"Settings"</button>
         </div>
     }
 }
@@ -94,7 +95,10 @@ fn content(
     view! {
         <div class="flex flex-col justify-center text-center">
             <h1 class="text-xl italic">"Rubber Ducking as a service! Finally!"</h1>
-            <img class="my-3 rounded-xl w-[400px]" src={move || ducky.get().source()} />
+            <img
+                class="my-8 rounded-xl w-[400px]"
+                srcset={move || ducky.get().srcset()}
+            />
 
             <Sounds playback_rate=playback_rate volume=volume/>
         </div>
@@ -119,63 +123,68 @@ fn settings(
         };
 
         view! {
-            <label class="m-2">
-                <input type="radio" name="duck"
+            <label>
+                <input class="hidden peer" type="radio" name="duck"
                     checked={move || selection.get() == duck}
                     on:click=select
                 />
-                <img class="w-64" src={duck.source()}/>
+                <img
+                    class="w-64 transition-all rounded-lg border-4 border-transparent peer-checked:border-sky-500 hover:border-sky-200"
+                    srcset=duck.srcset()
+                />
             </label>
         }
     };
 
+    let content = move || {
+        view! {
+            <p class="mb-2 text-lg font-bold">"Pick your duck!"</p>
+            <Slider
+                label="Playback rate"
+                value=playback_rate
+                default=DEFAULT_PLAYBACK_RATE
+                min=0.15
+                max=2.0
+            />
+            <Slider
+                label="Volume"
+                value=volume
+                default=DEFAULT_VOLUME
+                min=0.01
+                max=1.0
+            />
+            <div class="grid grid-cols-2 gap-4 my-2">
+                <For
+                    each=Duck::iter
+                    key=|duck| *duck
+                    view=duck_view
+                />
+            </div>
+            <button class="btn p-2" on:click=close>"Close"</button>
+        }
+    };
+
     view! {
-        <div class="relative z-10 aria-hidden:invisible" aria-hidden={move || if show.get(){"false"}else{"true"}}>
-            <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity" on:click=close/>
-            <div class="overflow-y-auto fixed inset-0 z-10">
-                <div class="flex justify-center items-center p-4 min-h-full text-center">
-                    <div class="flex relative flex-col gap-1 p-4 rounded-lg shadow-lg transform shrink bg-slate-600">
-                        <p class="mb-2 text-lg font-bold">"Pick your duck!"</p>
-                        <Slider
-                            label="Playback rate"
-                            value=playback_rate
-                            default=DEFAULT_PLAYBACK_RATE
-                            min=0.15
-                            max=2.0
-                        />
-                        <Slider
-                            label="Volume"
-                            value=volume
-                            default=DEFAULT_VOLUME
-                            min=0.01
-                            max=1.0
-                        />
-                        <div class="grid grid-cols-2 shrink">
-                            <For
-                                each=Duck::iter
-                                key=|duck| *duck
-                                view=duck_view
-                            />
-                        </div>
-                        <footer class="modal-card-foot">
-                            <button class="p-2 rounded-md border-2 bg-slate-700" on:click=close>"Close"</button>
-                        </footer>
-                    </div>
+        <div class="relative z-10" hidden={move || !show.get()}>
+            <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity"/>
+            <div class="flex fixed inset-0 justify-center items-center p-4 min-h-full text-center">
+                <div class="flex flex-col gap-1 p-4 rounded-lg shadow-lg bg-slate-700 text-slate-200">
+                    {content}
                 </div>
             </div>
         </div>
     }
 }
 
-const SOUNDS:&[&str] = &[
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_21.1_preview.mp3",
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_21.2_preview.mp3",
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_22.3_preview.mp3",
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_22.4_preview.mp3",
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_23.1_preview.mp3",
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_23.2_preview.mp3",
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_23.4_preview.mp3",
-    "https://cdn.videvo.net/videvo_files/audio/premium/audio0024/watermarked/AnimalDuckCart%20CTE01_24.1_preview.mp3",
+const SOUNDS: &[&str] = &[
+    "audio/duck1.mp3",
+    "audio/duck2.mp3",
+    "audio/duck3.mp3",
+    "audio/duck4.mp3",
+    "audio/duck5.mp3",
+    "audio/duck6.mp3",
+    "audio/duck7.mp3",
+    "audio/duck8.mp3",
 ];
 
 #[component]
@@ -219,12 +228,12 @@ impl Duck {
         [Self::One, Self::Two, Self::Three, Self::Four]
     }
 
-    fn source(self) -> &'static str {
+    fn srcset(self) -> &'static str {
         match self {
-            Self::One => "https://images.pexels.com/photos/3759364/pexels-photo-3759364.jpeg",
-            Self::Two => "https://images.pexels.com/photos/592677/pexels-photo-592677.jpeg",
-            Self::Three => "https://images.pexels.com/photos/5337590/pexels-photo-5337590.jpeg",
-            Self::Four => "https://images.pexels.com/photos/226601/pexels-photo-226601.jpeg",
+            Self::One => "image/duck1.webp, image/duck1@2x.webp 2x, image/duck1@4x.webp 4x",
+            Self::Two => "image/duck2.webp, image/duck2@2x.webp 2x, image/duck2@4x.webp 4x",
+            Self::Three => "image/duck3.webp, image/duck3@2x.webp 2x, image/duck3@4x.webp 4x",
+            Self::Four => "image/duck4.webp, image/duck4@2x.webp 2x, image/duck4@4x.webp 4x",
         }
     }
 }
@@ -244,7 +253,25 @@ fn slider(
         <div class="flex gap-1 self-stretch place-items-stretch text-left">
             <span class="w-32">{label}</span>
             <input class="grow" type="range" min=min max=max step="any" value={move || value.get()} prop:value={move || value.get()} on:change=input/>
-            <button class="py-0.5 px-1 rounded-md border-2 transition-all bg-slate-700 hover:bg-slate-600" on:click=reset>"Reset"</button>
+            <button class="btn py-0.5 px-1" on:click=reset>"Reset"</button>
+        </div>
+    }
+}
+
+#[component]
+fn footer() -> impl IntoView {
+    const PEXELS: &str = "https://www.pexels.com/search/rubber%20duck/";
+    const VIDEVO: &str = "https://www.videvo.net/search/?q=animal+duck+cartoon&mode=sound-effects";
+
+    view! {
+        <div class="fixed p-4 bottom-4 bg-slate-700/50 text-slate-400 rounded-lg">
+            "Images from "
+            <a class="link" href=PEXELS target="_blank">"Pexels"</a>
+
+            " • "
+
+            "Sounds from "
+            <a class="link" href=VIDEVO target="_blank">"Videvo"</a>
         </div>
     }
 }
