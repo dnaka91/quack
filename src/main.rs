@@ -243,6 +243,7 @@ fn slider(
 fn footer() -> impl IntoView {
     const PEXELS: &str = "https://www.pexels.com/search/rubber%20duck/";
     const VIDEVO: &str = "https://www.videvo.net/search/?q=animal+duck+cartoon&mode=sound-effects";
+    const GITHUB: &str = "https://github.com/dnaka91/quack";
 
     view! {
         <div class="footer my-4 flex-initial">
@@ -253,6 +254,11 @@ fn footer() -> impl IntoView {
 
             "Sounds from "
             <a class="link" href=VIDEVO target="_blank">"Videvo"</a>
+
+            " • "
+
+            "Source on "
+            <a class="link" href=GITHUB target="_blank">"GitHub"</a>
         </div>
     }
 }
