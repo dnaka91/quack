@@ -31,7 +31,8 @@ fn app() -> impl IntoView {
     let volume = create_stored_signal("volume", DEFAULT_VOLUME);
 
     view! {
-        <div class="flex flex-col gap-3 items-center place-content-center w-screen h-screen">
+        <div class="flex flex-col items-center w-screen h-screen">
+            <div class="grow flex flex-col gap-3 items-center place-content-center">
             <Navbar
                 settings=show_settings
             />
@@ -46,6 +47,7 @@ fn app() -> impl IntoView {
                 volume=volume
                 selection=ducky
             />
+            </div>
             <Footer/>
         </div>
     }
@@ -73,7 +75,7 @@ fn content(
         <div class="flex flex-col justify-center text-center">
             <h1 class="text-xl italic">"Rubber Ducking as a service! Finally!"</h1>
             <img
-                class="my-8 rounded-xl w-[400px]"
+                class="my-8 rounded-xl max-w-[400px]"
                 srcset={move || ducky.get().srcset()}
             />
 
@@ -190,7 +192,7 @@ fn sounds(playback_rate: Signal<f64>, volume: Signal<f64>) -> impl IntoView {
     };
 
     view! {
-        <button class="p-3 text-3xl bg-green-600 rounded-full border-2 border-green-700 transition-all hover:bg-green-700 hover:border-green-600 w-[400px]" on:click=play>"🔊 Play Sound"</button>
+        <button class="p-3 text-3xl bg-green-600 rounded-full border-2 border-green-700 transition-all hover:bg-green-700 hover:border-green-600 max-w-[400px]" on:click=play>"🔊 Play Sound"</button>
     }
 }
 
@@ -243,7 +245,7 @@ fn footer() -> impl IntoView {
     const VIDEVO: &str = "https://www.videvo.net/search/?q=animal+duck+cartoon&mode=sound-effects";
 
     view! {
-        <div class="footer fixed bottom-4">
+        <div class="footer my-4 flex-initial">
             "Images from "
             <a class="link" href=PEXELS target="_blank">"Pexels"</a>
 

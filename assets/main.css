@@ -22,7 +22,7 @@
     }
 
     .footer {
-        @apply p-4 bg-slate-700/50 text-slate-400 rounded-lg;
+        @apply p-4 bg-slate-700/50 text-slate-400 rounded-lg text-sm;
     }
 
     .dialog {
