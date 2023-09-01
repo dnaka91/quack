@@ -233,7 +233,7 @@ fn slider(
     view! {
         <div class="slider">
             <span class="w-32">{label}</span>
-            <input class="grow" type="range" min=min max=max step="any" value={move || value.get()} prop:value={move || value.get()} on:change=input/>
+            <input class="grow" type="range" min=min max=max step="any" value=value prop:value=value on:change=input/>
             <button class="btn py-0.5 px-1" on:click=reset>"Reset"</button>
         </div>
     }
