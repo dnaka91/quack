@@ -33,20 +33,14 @@ fn app() -> impl IntoView {
     view! {
         <div class="flex flex-col items-center w-screen h-screen">
             <div class="grow flex flex-col gap-3 items-center place-content-center">
-            <Navbar
-                settings=show_settings
-            />
-            <Content
-                ducky=ducky
-                playback_rate=playback_rate
-                volume=volume
-            />
-            <Settings
-                show=show_settings
-                playback_rate=playback_rate
-                volume=volume
-                selection=ducky
-            />
+                <Navbar settings=show_settings/>
+                <Content ducky=ducky playback_rate=playback_rate volume=volume/>
+                <Settings
+                    show=show_settings
+                    playback_rate=playback_rate
+                    volume=volume
+                    selection=ducky
+                />
             </div>
             <Footer/>
         </div>
@@ -60,7 +54,9 @@ fn navbar(#[prop(into)] settings: SignalSetter<bool>) -> impl IntoView {
     view! {
         <div class="flex gap-2 place-items-center">
             <div class="text-2xl">"🦆 Quack"</div>
-            <button class="btn p-2" on:click=settings>"Settings"</button>
+            <button class="btn p-2" on:click=settings>
+                "Settings"
+            </button>
         </div>
     }
 }
@@ -74,10 +70,7 @@ fn content(
     view! {
         <div class="flex flex-col justify-center text-center">
             <h1 class="text-xl italic">"Rubber Ducking as a service! Finally!"</h1>
-            <img
-                class="my-8 rounded-xl max-w-[400px]"
-                srcset={move || ducky.get().srcset()}
-            />
+            <img class="my-8 rounded-xl max-w-[400px]" srcset=move || ducky.get().srcset()/>
 
             <Sounds playback_rate=playback_rate volume=volume/>
         </div>
@@ -102,14 +95,14 @@ fn settings(
 
         view! {
             <label>
-                <input class="hidden peer" type="radio" name="duck"
-                    checked={move || selection.get() == duck}
+                <input
+                    class="hidden peer"
+                    type="radio"
+                    name="duck"
+                    checked=move || selection.get() == duck
                     on:click=select
                 />
-                <img
-                    class="settings-duck-image"
-                    srcset=duck.srcset()
-                />
+                <img class="settings-duck-image" srcset=duck.srcset()/>
             </label>
         }
     };
@@ -124,21 +117,13 @@ fn settings(
                 min=0.15
                 max=2.0
             />
-            <Slider
-                label="Volume"
-                value=volume
-                default=DEFAULT_VOLUME
-                min=0.01
-                max=1.0
-            />
+            <Slider label="Volume" value=volume default=DEFAULT_VOLUME min=0.01 max=1.0/>
             <div class="settings-ducks">
-                <For
-                    each=Duck::iter
-                    key=|duck| *duck
-                    view=duck_view
-                />
+                <For each=Duck::iter key=|duck| *duck view=duck_view/>
             </div>
-            <button class="btn p-2" on:click=close>"Close"</button>
+            <button class="btn p-2" on:click=close>
+                "Close"
+            </button>
         </Dialog>
     }
 }
@@ -146,12 +131,10 @@ fn settings(
 #[component]
 fn dialog(children: Children, #[prop(into)] show: Signal<bool>) -> impl IntoView {
     view! {
-        <div class="dialog" hidden={move || !show.get()}>
-            <div class="dialog-backdrop"/>
+        <div class="dialog" hidden=move || !show.get()>
+            <div class="dialog-backdrop"></div>
             <div class="dialog-content">
-                <div class="settings-dialog">
-                    {children()}
-                </div>
+                <div class="settings-dialog">{children()}</div>
             </div>
         </div>
     }
@@ -192,7 +175,12 @@ fn sounds(playback_rate: Signal<f64>, volume: Signal<f64>) -> impl IntoView {
     };
 
     view! {
-        <button class="p-3 text-3xl bg-green-600 rounded-full border-2 border-green-700 transition-all hover:bg-green-700 hover:border-green-600 max-w-[400px]" on:click=play>"🔊 Play Sound"</button>
+        <button
+            class="p-3 text-3xl bg-green-600 rounded-full border-2 border-green-700 transition-all hover:bg-green-700 hover:border-green-600 max-w-[400px]"
+            on:click=play
+        >
+            "🔊 Play Sound"
+        </button>
     }
 }
 
@@ -233,8 +221,19 @@ fn slider(
     view! {
         <div class="slider">
             <span class="w-32">{label}</span>
-            <input class="grow" type="range" min=min max=max step="any" value=value prop:value=value on:change=input/>
-            <button class="btn py-0.5 px-1" on:click=reset>"Reset"</button>
+            <input
+                class="grow"
+                type="range"
+                min=min
+                max=max
+                step="any"
+                value=value
+                prop:value=value
+                on:change=input
+            />
+            <button class="btn py-0.5 px-1" on:click=reset>
+                "Reset"
+            </button>
         </div>
     }
 }
@@ -247,18 +246,17 @@ fn footer() -> impl IntoView {
 
     view! {
         <div class="footer my-4 flex-initial">
-            "Images from "
-            <a class="link" href=PEXELS target="_blank">"Pexels"</a>
-
+            "Images from " <a class="link" href=PEXELS target="_blank">
+                "Pexels"
+            </a>
             " • "
-
-            "Sounds from "
-            <a class="link" href=VIDEVO target="_blank">"Videvo"</a>
-
+            "Sounds from " <a class="link" href=VIDEVO target="_blank">
+                "Videvo"
+            </a>
             " • "
-
-            "Source on "
-            <a class="link" href=GITHUB target="_blank">"GitHub"</a>
+            "Source on " <a class="link" href=GITHUB target="_blank">
+                "GitHub"
+            </a>
         </div>
     }
 }
