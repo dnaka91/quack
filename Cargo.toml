@@ -10,7 +10,7 @@ console_error_panic_hook = "0.1.7"
 console_log = { version = "1.0.0", features = ["color"] }
 fastrand = { version = "2.0.0", features = ["js"] }
 gloo-storage = "0.3.0"
-leptos = { version = "0.5.0-beta2", features = ["csr"] }
+leptos = { version = "0.5.0-rc1", features = ["csr"] }
 log = { version = "0.4.20", features = ["release_max_level_off"] }
 serde = { version = "1.0.188", features = ["derive"] }
 wasm-bindgen = "0.2.87"
