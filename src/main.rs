@@ -119,7 +119,7 @@ fn settings(
             />
             <Slider label="Volume" value=volume default=DEFAULT_VOLUME min=0.01 max=1.0/>
             <div class="settings-ducks">
-                <For each=Duck::iter key=|duck| *duck view=duck_view/>
+                <For each=Duck::iter key=|duck| *duck children=duck_view/>
             </div>
             <button class="btn p-2" on:click=close>
                 "Close"
