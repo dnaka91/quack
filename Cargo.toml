@@ -11,12 +11,12 @@ console_error_panic_hook = "0.1.7"
 console_log = { version = "1.0.0", features = ["color"] }
 fastrand = { version = "2.0.1", features = ["js"] }
 gloo-storage = "0.3.0"
-leptos = { version = "0.5.0", features = ["csr"] }
+leptos = { version = "0.5.2", features = ["csr"] }
 log = { version = "0.4.20", features = ["release_max_level_off"] }
-serde = { version = "1.0.188", features = ["derive"] }
-wasm-bindgen = "0.2.87"
-wasm-bindgen-futures = "0.4.37"
-web-sys = { version = "0.3.64", features = ["HtmlAudioElement"] }
+serde = { version = "1.0.190", features = ["derive"] }
+wasm-bindgen = "0.2.88"
+wasm-bindgen-futures = "0.4.38"
+web-sys = { version = "0.3.65", features = ["HtmlAudioElement"] }
 
 [profile.release]
 lto = true
