@@ -8,7 +8,5 @@ exceptions = [
 
 [bans]
 skip = [
-    { name = "gloo-utils", version = "0.1" },
-    { name = "itertools", version = "0.10" },
-    { name = "socket2", version = "0.4" },
+    { name = "http", version = "0.2" },
 ]
