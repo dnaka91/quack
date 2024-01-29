@@ -129,6 +129,41 @@ fn settings(
 }
 
 #[component]
+fn licenses(show: RwSignal<bool>) -> impl IntoView {
+    const PEXELS: &str = "https://www.pexels.com/search/rubber%20duck/";
+    const VIDEVO: &str = "https://www.videvo.net/search/?q=animal+duck+cartoon&mode=sound-effects";
+
+    view! {
+        <Dialog show=show>
+            <p class="settings-header">"Asset Licenses"</p>
+            <div class="text-start">
+                <p class="pb-3">
+                    "Images from "
+                    <a class="link" href=PEXELS target="_blank">"Pexels"</a>
+                </p>
+                <p class="pb-3">
+                    "Most sounds from "
+                    <a class="link" href=VIDEVO target="_blank">"Videvo"</a>
+                </p>
+                <p class="pb-3">
+                    "Individual sounds by: "
+                    <ul class="list-disc list-inside">
+                        <li>
+                            <a class="link" href="https://albertlarsan.fr/" target="_blank">
+                                "Albert Larsan"
+                            </a>
+                        </li>
+                    </ul>
+                </p>
+            </div>
+            <button class="btn p-2" on:click=move |_| show.set(false)>
+                "Close"
+            </button>
+        </Dialog>
+    }
+}
+
+#[component]
 fn dialog(children: Children, #[prop(into)] show: Signal<bool>) -> impl IntoView {
     view! {
         <div class="dialog" hidden=move || !show.get()>
@@ -149,6 +184,7 @@ const SOUNDS: &[&str] = &[
     "audio/duck6.mp3",
     "audio/duck7.mp3",
     "audio/duck8.mp3",
+    "audio/quack1.mp3",
 ];
 
 #[component]
@@ -240,24 +276,21 @@ fn slider(
 
 #[component]
 fn footer() -> impl IntoView {
-    const PEXELS: &str = "https://www.pexels.com/search/rubber%20duck/";
-    const VIDEVO: &str = "https://www.videvo.net/search/?q=animal+duck+cartoon&mode=sound-effects";
     const GITHUB: &str = "https://github.com/dnaka91/quack";
 
+    let show_licenses = create_rw_signal(false);
+
     view! {
-        <div class="footer my-4 flex-initial">
-            "Images from " <a class="link" href=PEXELS target="_blank">
-                "Pexels"
-            </a>
-            " • "
-            "Sounds from " <a class="link" href=VIDEVO target="_blank">
-                "Videvo"
-            </a>
-            " • "
-            "Source on " <a class="link" href=GITHUB target="_blank">
-                "GitHub"
-            </a>
-        </div>
+        <>
+            <div class="footer my-4 flex-initial">
+                <button class="link" on:click=move |_| show_licenses.set(true)>"Licenses"</button>
+                " • "
+                "Source on " <a class="link" href=GITHUB target="_blank">
+                    "GitHub"
+                </a>
+            </div>
+            <Licenses show=show_licenses/>
+        </>
     }
 }
 
